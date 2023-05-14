@@ -12,7 +12,6 @@ const dbSettings = {
     },
 }
 
-
 export async function getConnection() {
     try {
         const pool = await sql.connect(dbSettings);
@@ -22,105 +21,166 @@ export async function getConnection() {
     }
 }
 
-const tedious = require("tedious");
-//const tedious = require('tedious');
-const { Connection, Request } = tedious;
+export { sql };
 
-const config2 = {
-  server: 'JPABLIX',
+
+
+//////////////////////////////// TEDIOUS ////////////////////////////////
+
+/*
+const Request = require("tedious").Request;
+const Connection = require("tedious").Connection;
+
+const connectionConfig = {
+  server: config.dbServer,
   authentication: {
-    type: 'default',
+    type: "default",
     options: {
-      userName: 'sa',
-      password: 'Pablito09'
-    }
+      userName: config.dbUser,
+      password: config.dbPassword,
+    },
   },
   options: {
-    database: 'caso3',
+    encrypt: true,
+    trustServerCertificate: true,
+    database: config.dbDatabase,
+  },
+};
+
+const connection = new Connection(connectionConfig);
+
+connection.connect();
+
+connection.on("connect", (err) => {
+  if (err) {
+    console.error(`Error connecting to the database: ${err}`);
+    throw err;
+  } else {
+    executeStatement();
+  }
+});
+
+function executeStatement() {
+  console.log("Connected to database by tedious");
+  const request = new Request("SELECT TOP 10 * FROM contacts ORDER BY contactId DESC", (err, rowCount, rows) => {
+    if (err) {
+      console.log(`Error querying the database: ${err}`);
+      throw err;
+    }
+    connection.close();
+  });
+  request.on("row", (columns) => {
+    console.log(columns);
+  });
+  connection.execSql(request);
+}
+*/
+///////////////////////////
+
+//const { Request } = require('tedious');
+
+
+const { ConnectionPool, Request } = require("tedious");
+
+
+const poolConfig = {
+  min: 1,
+  max: 10,
+  log: false,
+};
+
+const connectionConfig = {
+  port: 3000,
+  userName: config.dbUser,
+  password: config.dbPassword,
+  server: config.dbServer,
+  database: config.dbDatabase,
+  options: {
+    encrypt: true,
     trustServerCertificate: true
+  },
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000
   }
 };
-const connection = new Connection(config);
 
+const pool = new ConnectionPool(poolConfig, connectionConfig);
 
-export function getTediousConnection() {
-  const connectionConfig = {
-    server: config.dbServer,
-    authentication: {
-      type: "default",
-      options: {
-        userName: config.dbUser,
-        password: config.dbPassword,
-      },
-    },
-    options: {
-      encrypt: true,
-      trustServerCertificate: true,
-      database: config.dbDatabase,
-    },
-  };
+pool.on('error', err => {
+  console.error('Error connecting to the database:', err);
+});
 
-  return new Promise((resolve, reject) => {
-    const connection = new tedious.Connection(connectionConfig);
+console.log(pool);
 
-    connection.on("connect", (err) => {
-      if (err) {
-        reject(`Error connecting to the database: ${err}`);
-      } else {
-        console.log("Connected to the database.");
-        resolve(connection);
-      }
-    });
-  });
-}
+const request = new Request('SELECT 1', (err, rowCount, rows) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log(`Returned ${rowCount} row(s)`);
+    console.log(rows);
+  }
+});
 
-  
-  
-
-
+pool.acquire((err, connection) => {
+  if (err) {
+    console.error(err);
+  } else {
+    connection.execSql(request);
+  }
+});
 
 
 /*
-export async function getTediusConnection() {
-    console.log(config);
-  
-    const connection = new tedious.Connection(config);
-    try {
-      await new Promise((resolve, reject) => {
-        connection.on("connect", (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            console.log("Connected to the database.");
-            resolve();
-          }
-        });
-      });
-      return connection;
-    } catch (error) {
-      console.error("Error connecting to the database:", error);
-    } finally {
-      dbSettings.port = defaultPort; // Restauramos el puerto por defecto
-    }
-  } */
-
-  /*
-  export async function getTediusConnection() {
-    const connectionConfig = { ...config }; // Crear una copia de config
-    connectionConfig.port = 5000; // Cambiar el puerto temporalmente
-  
-    const connection = new tedious.Connection(connectionConfig);
-    return new Promise((resolve, reject) => {
-      connection.on("connect", (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          console.log("Connected to the database.");
-          connectionConfig.port = config.port; // Devolver el puerto a su valor original
-          resolve(connection);
-        }
-      });
+pool.on('error', err => {
+  if (err) {
+    pool.on('debug', text => {
+      console.log(`Database debug info: ${text}`);
     });
-  }*/
+  } else {
+    console.log('Connected to the database');
+  }
+});
+
+
+pool.on('connect', () => {
+  console.log('Connected to the database');
+
+  const request = new tedious.Request('SELECT 1', (err, rowCount, rows) => {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log(`Returned ${rowCount} row(s)`);
+      console.log(rows);
+    }
+  });
+
+  request.execute();
+});
+
+*/
+
+
+/*
+pool.acquire((err, connection) => {
+  if (err) {
+    console.error(`Error acquiring database connection: ${err}`);
+    throw err;
+  } else {
+    console.log("Connected to database by tedious-connection-pool");
+  }
   
-export { sql };
+  const request = new Request("SELECT TOP 10 * FROM contacts ORDER BY contactId DESC", (err, rowCount, rows) => {
+    if (err) {
+      console.log(`Error querying the database: ${err}`);
+      throw err;
+    }
+    connection.close();
+  });
+  request.on("row", (columns) => {
+    console.log(columns);
+  });
+  connection.execSql(request);
+});
+*/

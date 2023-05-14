@@ -14,6 +14,7 @@ export const getLast10Contacts = async (req, res) => {
     const result = await pool.request().query(queries.getLast10Contacts);
     console.log(result);
 
+
     res.json(result.recordset);
 };
 
@@ -38,8 +39,8 @@ export const createNewContact = async (req, res) => {
     .query(queries.createNewContact);
 
     const result = await pool.request().query(queries.getLast10Contacts);
-    console.log(name, surname1, surname2, email, phone, notes, contactType);
     res.json(result.recordset);
-    res.json('New contact created');
+    console.log(name, surname1, surname2, email, phone, notes, contactType);
+    console.log('New contact created');
 }
 
