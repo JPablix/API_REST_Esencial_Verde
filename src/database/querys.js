@@ -1,6 +1,6 @@
 export const queries = {    
     // Queries for containers
-    getAllContainers: 'SELECT * FROM containers',
+    getAllContainers: 'SELECT TOP 10 * FROM contacts',
     getContainersByWaste: 'EXEC GetUnusedContainersForWasteType @wasteTypeId = @Id',
     // Queries for contacts
     getAllContacts: 'SELECT * FROM contacts',
