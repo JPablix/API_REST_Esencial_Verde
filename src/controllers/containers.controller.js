@@ -9,7 +9,6 @@ export const getContainers = async (req, res) => {
     res.json(result.recordset);
 };
 
-
 export const getContainersByWaste = async (req, res) => {
     const {id} = req.params;
     try{
@@ -17,11 +16,10 @@ export const getContainersByWaste = async (req, res) => {
         const result = await pool.request()
             .input('Id', sql.Int, id)
             .query(queries.getContainersByWaste)
-        console.log(result);
+        res.json(result.recordset);
     } catch (error) {
         res.status(500);
         res.send(error.message);
     }
-    res.send(id);
+    
 }
-
