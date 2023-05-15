@@ -13,18 +13,6 @@ const dbSettings = {
 }
 
 const pool = new sql.ConnectionPool(dbSettings);
-//Sent a query to pool
-/*pool.connect().then(pool => {
-    const result = pool.request().query('SELECT TOP 10 * FROM contacts ORDER BY contactId DESC');
-    result.then(recordset => {
-        console.log(recordset);
-        sql.close();
-    }).catch(err => {
-        console.error('Failed to retrieve data: ', err);
-        sql.close();
-    });
-}).catch(err => console.error('Database Connection Failed! Bad Config: ', err));
-*/
 export default pool;
 
 export async function getConnection() {
