@@ -6,4 +6,5 @@ export const queries = {
     getAllContacts: 'SELECT * FROM contacts',
     getLast10Contacts: 'SELECT TOP 10 * FROM contacts ORDER BY contactId DESC',
     createNewContact: 'INSERT INTO contacts (name, surname1, surname2, email, phone, notes, contactType) VALUES (@name, @surname1, @surname2, @email, @phone, @notes, @contactType)',
+    getLast10ContactsByType: 'EXEC GetLastNContactsByType @contactType = @type, @N = @quantity',
 }

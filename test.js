@@ -20,11 +20,11 @@ const config = {
 app.get('/countries/pool', async (req, res) => {
   try {
     const pool = await new sql.ConnectionPool(config).connect(); // Crear una nueva conexión de pool
-    const result = await pool.request().query('SELECT 1');
+    const result = await pool.request().query('SELECT TOP 10 * FROM contacts ORDER BY contactId DESC');
     res.send(result.recordset);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error al obtener los países');
+    res.status(500).send('Error al obtener los contactos');
   }
 });
 
@@ -32,11 +32,11 @@ app.get('/countries/pool', async (req, res) => {
 app.get('/countries/nopool', async (req, res) => {
   try {
     const connection = await sql.connect(config); // Crear una nueva conexión sin pool
-    const result = await connection.request().query('SELECT 1');
+    const result = await connection.request().query('SELECT TOP 10 * FROM contacts ORDER BY contactId DESC');
     res.send(result.recordset);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error al obtener los países');
+    res.status(500).send('Error al obtener los contactos');
   }
 });
 
